@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Productos;
 
-use App\Filament\Resources\ProductoResource\Pages;
+use App\Filament\Resources\Productos\Pages\ListProductos;
+use App\Filament\Resources\Productos\Pages\EditProducto;
+use App\Filament\Resources\Productos\Pages\CreateProducto;
+use App\Filament\Resources\Productos\Pages;
 use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\Proveedor;
@@ -12,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
@@ -20,6 +22,9 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -177,10 +182,12 @@ class ProductoResource extends Resource
                     ->label('Stock')
                     ->sortable()
                     ->alignCenter()
-                    ->color(fn (Producto $record): string =>
+                    ->color(
+                        fn(Producto $record): string =>
                         $record->tieneStockBajo() ? 'danger' : 'success'
                     )
-                    ->weight(fn (Producto $record): string =>
+                    ->weight(
+                        fn(Producto $record): string =>
                         $record->tieneStockBajo() ? 'bold' : 'normal'
                     ),
 
@@ -204,7 +211,8 @@ class ProductoResource extends Resource
 
                 Filter::make('stock_bajo')
                     ->label('Stock bajo mínimo')
-                    ->query(fn (Builder $query) =>
+                    ->query(
+                        fn(Builder $query) =>
                         $query->whereColumn('stock', '<=', 'stock_minimo')
                     )
                     ->toggle(),
