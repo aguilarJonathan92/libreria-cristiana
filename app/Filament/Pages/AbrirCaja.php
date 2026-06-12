@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
 use Filament\Notifications\Notification;
@@ -43,9 +44,9 @@ class AbrirCaja extends Page implements HasForms
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 TextInput::make('monto_inicial')
                     ->label('Monto inicial en caja ($)')

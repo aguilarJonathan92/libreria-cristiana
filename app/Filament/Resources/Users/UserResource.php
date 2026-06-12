@@ -13,9 +13,9 @@ use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
@@ -92,10 +92,10 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([EditAction::make()])
-            ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
-            ]);
+                ->recordActions([EditAction::make()])
+                ->toolbarActions([
+                    ActionGroup::make([DeleteBulkAction::make()]),
+                ]);
     }
 
     public static function getPages(): array

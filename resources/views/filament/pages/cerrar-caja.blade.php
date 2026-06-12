@@ -1,10 +1,8 @@
 <x-filament-panels::page>
 
-    {{-- Resumen de la caja actual --}}
     @if($this->cajaActual)
     <x-filament::section>
         <x-slot name="heading">Caja abierta por {{ $this->cajaActual->usuario->name }}</x-slot>
-
         <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
                 <span class="font-medium text-gray-500">Apertura:</span>
@@ -18,13 +16,12 @@
     </x-filament::section>
     @endif
 
-    {{-- Formulario de cierre --}}
-    <x-filament-panels::form wire:submit="cerrarCaja">
+    <form wire:submit="cerrarCaja" id="form-cerrar-caja" class="grid gap-y-6">
         {{ $this->form }}
 
-        <x-filament-panels::form.actions
+        <x-filament::actions
             :actions="$this->getFormActions()"
         />
-    </x-filament-panels::form>
+    </form>
 
 </x-filament-panels::page>

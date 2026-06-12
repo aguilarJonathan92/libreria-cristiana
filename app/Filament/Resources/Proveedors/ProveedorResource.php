@@ -10,9 +10,9 @@ use BackedEnum;
 use UnitEnum;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -75,9 +75,9 @@ class ProveedorResource extends Resource
                     ->counts('productos')
                     ->sortable(),
             ])
-            ->actions([EditAction::make()])
-            ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
+            ->recordActions([EditAction::make()])
+            ->toolbarActions([
+                ActionGroup::make([DeleteBulkAction::make()]),
             ]);
     }
 

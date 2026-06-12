@@ -16,8 +16,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -218,9 +219,9 @@ class ProductoResource extends Resource
                     ->toggle(),
             ])
             ->defaultSort('nombre')
-            ->actions([EditAction::make()])
-            ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
+            ->recordActions([EditAction::make()])
+            ->toolbarActions([
+                ActionGroup::make([DeleteBulkAction::make()]),
             ]);
     }
 

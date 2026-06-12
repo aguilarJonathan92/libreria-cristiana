@@ -11,7 +11,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ActionGroup;
 use App\Models\Categoria;
 use BackedEnum;
 use UnitEnum;
@@ -66,9 +68,9 @@ class CategoriaResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([EditAction::make()])
-            ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
+            ->recordActions([EditAction::make()])
+            ->toolbarActions([
+                ActionGroup::make([DeleteBulkAction::make()]),
             ]);
     }
 
