@@ -6,17 +6,17 @@ use App\Enums\EstadoCaja;
 use App\Models\Caja;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use BackedEnum;
 use UnitEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Concerns\InteractsWithSchemas;  
+use Filament\Schemas\Contracts\HasSchemas;            
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
-class CerrarCaja extends Page implements HasForms
+class CerrarCaja extends Page implements HasSchemas
 {
-    use InteractsWithForms;
+    use InteractsWithSchemas;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-lock-closed';
     protected static ?string $navigationLabel = 'Caja del Día';
@@ -45,10 +45,10 @@ class CerrarCaja extends Page implements HasForms
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('monto_final')
                     ->label('Efectivo en caja al cierre ($)')
                     ->numeric()

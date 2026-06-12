@@ -6,9 +6,8 @@ use App\Enums\EstadoCaja;
 use App\Models\Caja;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Concerns\InteractsWithSchemas;  
+use Filament\Schemas\Contracts\HasSchemas; 
 use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
@@ -16,9 +15,9 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 
-class AbrirCaja extends Page implements HasForms
+class AbrirCaja extends Page implements HasSchemas
 {
-    use InteractsWithForms;
+    use InteractsWithSchemas;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-dollar';
     protected static ?string $navigationLabel = 'Abrir Caja';
@@ -47,7 +46,7 @@ class AbrirCaja extends Page implements HasForms
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 TextInput::make('monto_inicial')
                     ->label('Monto inicial en caja ($)')
                     ->numeric()
