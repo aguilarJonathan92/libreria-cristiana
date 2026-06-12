@@ -40,8 +40,10 @@ class Producto extends Model
         return $this->belongsTo(Proveedor::class);
     }
 
-    // Sprints posteriores
-    // public function detallesVenta(): HasMany { ... }
+    public function detallesVenta(): HasMany
+    {
+        return $this->hasMany(DetalleVenta::class);
+    }
 
     public function tieneStockBajo(): bool
     {
