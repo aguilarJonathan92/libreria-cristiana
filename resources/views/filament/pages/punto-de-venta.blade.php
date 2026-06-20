@@ -1,236 +1,238 @@
 <x-filament-panels::page>
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+<style>
+    .fi-page-content { max-width: 100% !important; }
+</style>
 
-        {{-- ═══════════════════════════════════════════════
-             COLUMNA IZQUIERDA — Buscador y carrito (2/3)
-        ════════════════════════════════════════════════ --}}
-        <div class="space-y-4 lg:col-span-2">
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start;">
 
-            {{-- Buscador --}}
-            <x-filament::section>
-                <x-slot name="heading">Buscar Producto</x-slot>
+    {{-- ═══════════════════════════════════════════
+         COLUMNA IZQUIERDA — Buscador + Carrito (2/3)
+    ════════════════════════════════════════════ --}}
+    <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 16px;">
 
-                <div class="relative">
-                    <input
-                        type="text"
-                        wire:model.live.debounce.300ms="busqueda"
-                        placeholder="Nombre, SKU o código de barras..."
-                        class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    />
-
-                    {{-- Resultados del buscador --}}
-                    @if(count($resultados) > 0)
-                    <div class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                        @foreach($resultados as $producto)
-                        <button
-                            wire:click="agregarAlCarrito({{ $producto['id'] }})"
-                            class="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                        >
-                            <div>
-                                <span class="font-medium text-gray-900 dark:text-white">
-                                    {{ $producto['nombre'] }}
-                                </span>
-                                <span class="ml-2 text-xs text-gray-400">
-                                    {{ $producto['sku'] }}
-                                </span>
-                            </div>
-                            <div class="text-right">
-                                <span class="font-semibold text-primary-600">
-                                    ${{ number_format($producto['precio_venta'], 2, ',', '.') }}
-                                </span>
-                                <span class="ml-2 text-xs text-gray-400">
-                                    Stock: {{ $producto['stock'] }}
-                                </span>
-                            </div>
-                        </button>
-                        @endforeach
-                    </div>
-                    @endif
+        {{-- Buscador --}}
+        <x-filament::section>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <x-heroicon-o-magnifying-glass style="width: 16px; height: 16px; color: #1d4ed8;" />
                 </div>
-            </x-filament::section>
+                <h2 style="font-size: 14px; font-weight: 500; margin: 0;">Buscar producto</h2>
+            </div>
 
-            {{-- Carrito --}}
-            <x-filament::section>
-                <x-slot name="heading">
+            <div style="position: relative;">
+                <input
+                    type="text"
+                    wire:model.live.debounce.300ms="busqueda"
+                    placeholder="Nombre, SKU o código de barras..."
+                    style="width: 100%; height: 42px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 14px; font-size: 14px; background: #f9fafb; box-sizing: border-box;"
+                />
+
+                @if(count($resultados) > 0)
+                <div style="position: absolute; z-index: 50; top: 100%; left: 0; right: 0; margin-top: 4px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
+                    @foreach($resultados as $producto)
+                    <button
+                        wire:click="agregarAlCarrito({{ $producto['id'] }})"
+                        style="display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 10px 14px; text-align: left; font-size: 13px; border: none; background: white; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'"
+                    >
+                        <div>
+                            <span style="font-weight: 500; color: #111827;">{{ $producto['nombre'] }}</span>
+                            <span style="margin-left: 8px; font-size: 11px; color: #9ca3af;">{{ $producto['sku'] }}</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-weight: 600; color: #0f766e;">${{ number_format($producto['precio_venta'], 2, ',', '.') }}</span>
+                            <span style="margin-left: 8px; font-size: 11px; color: #9ca3af;">Stock: {{ $producto['stock'] }}</span>
+                        </div>
+                    </button>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+        </x-filament::section>
+
+        {{-- Carrito --}}
+        <x-filament::section>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #f0fdf4; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <x-heroicon-o-shopping-cart style="width: 16px; height: 16px; color: #15803d;" />
+                </div>
+                <h2 style="font-size: 14px; font-weight: 500; margin: 0;">
                     Carrito
                     @if(count($carrito) > 0)
-                        <span class="ml-2 text-sm font-normal text-gray-400">
+                        <span style="margin-left: 6px; font-size: 12px; font-weight: 400; color: #9ca3af;">
                             ({{ count($carrito) }} {{ count($carrito) === 1 ? 'ítem' : 'ítems' }})
                         </span>
                     @endif
-                </x-slot>
+                </h2>
+            </div>
 
-                @if(empty($carrito))
-                    <p class="py-8 text-center text-sm text-gray-400">
-                        Buscá un producto para agregarlo al carrito.
-                    </p>
-                @else
-                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                        @foreach($carrito as $index => $item)
-                        <div class="flex items-center gap-4 py-3">
+            @if(empty($carrito))
+                <div style="padding: 40px 0; text-align: center;">
+                    <x-heroicon-o-shopping-bag style="width: 36px; height: 36px; color: #d1d5db; margin: 0 auto 8px;" />
+                    <p style="font-size: 13px; color: #9ca3af; margin: 0;">Buscá un producto para agregarlo al carrito.</p>
+                </div>
+            @else
+                <div>
+                    @foreach($carrito as $index => $item)
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
 
-                            {{-- Nombre --}}
-                            <div class="flex-1 min-w-0">
-                                <p class="truncate text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $item['nombre'] }}
-                                </p>
-                                <p class="text-xs text-gray-400">
-                                    ${{ number_format($item['precio_unitario'], 2, ',', '.') }} c/u
-                                </p>
-                            </div>
-
-                            {{-- Control de cantidad --}}
-                            <div class="flex items-center gap-2">
-                                <button
-                                    wire:click="cambiarCantidad({{ $index }}, {{ $item['cantidad'] - 1 }})"
-                                    class="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-                                >−</button>
-
-                                <span class="w-8 text-center text-sm font-semibold">
-                                    {{ $item['cantidad'] }}
-                                </span>
-
-                                <button
-                                    wire:click="cambiarCantidad({{ $index }}, {{ $item['cantidad'] + 1 }})"
-                                    class="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-                                >+</button>
-                            </div>
-
-                            {{-- Subtotal --}}
-                            <div class="w-24 text-right">
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                                    ${{ number_format($item['subtotal'], 2, ',', '.') }}
-                                </span>
-                            </div>
-
-                            {{-- Eliminar --}}
-                            <button
-                                wire:click="eliminarDelCarrito({{ $index }})"
-                                class="text-red-400 hover:text-red-600"
-                            >
-                                <x-heroicon-o-x-mark class="h-4 w-4" />
-                            </button>
+                        {{-- Nombre --}}
+                        <div style="flex: 1; min-width: 0;">
+                            <p style="font-size: 13px; font-weight: 500; color: #111827; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ $item['nombre'] }}
+                            </p>
+                            <p style="font-size: 11px; color: #9ca3af; margin: 2px 0 0;">
+                                ${{ number_format($item['precio_unitario'], 2, ',', '.') }} c/u
+                            </p>
                         </div>
-                        @endforeach
+
+                        {{-- Cantidad --}}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button
+                                wire:click="cambiarCantidad({{ $index }}, {{ $item['cantidad'] - 1 }})"
+                                style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #e5e7eb; background: white; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280;"
+                            >−</button>
+                            <span style="width: 28px; text-align: center; font-size: 14px; font-weight: 600;">{{ $item['cantidad'] }}</span>
+                            <button
+                                wire:click="cambiarCantidad({{ $index }}, {{ $item['cantidad'] + 1 }})"
+                                style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #e5e7eb; background: white; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280;"
+                            >+</button>
+                        </div>
+
+                        {{-- Subtotal --}}
+                        <div style="width: 80px; text-align: right;">
+                            <span style="font-size: 13px; font-weight: 600; color: #111827;">
+                                ${{ number_format($item['subtotal'], 2, ',', '.') }}
+                            </span>
+                        </div>
+
+                        {{-- Eliminar --}}
+                        <button
+                            wire:click="eliminarDelCarrito({{ $index }})"
+                            style="width: 28px; height: 28px; border-radius: 6px; border: none; background: #fef2f2; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                            onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'"
+                        >
+                            <x-heroicon-o-x-mark style="width: 14px; height: 14px; color: #ef4444;" />
+                        </button>
                     </div>
+                    @endforeach
 
                     {{-- Total --}}
-                    <div class="mt-4 flex justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
-                        <span class="text-base font-semibold text-gray-700 dark:text-gray-300">Total</span>
-                        <span class="text-xl font-bold text-primary-600">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                        <span style="font-size: 14px; font-weight: 500; color: #374151;">Total</span>
+                        <span style="font-size: 22px; font-weight: 700; color: #0f766e;">
                             ${{ number_format($this->totalCarrito, 2, ',', '.') }}
                         </span>
                     </div>
-                @endif
-            </x-filament::section>
-        </div>
+                </div>
+            @endif
+        </x-filament::section>
+    </div>
 
-        {{-- ═══════════════════════════════════════════════
-             COLUMNA DERECHA — Cobro (1/3)
-        ════════════════════════════════════════════════ --}}
-        <div class="space-y-4">
+    {{-- ═══════════════════════════════════════════
+         COLUMNA DERECHA — Cobro (1/3)
+    ════════════════════════════════════════════ --}}
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        <x-filament::section>
 
-            <x-filament::section>
-                <x-slot name="heading">Cobro</x-slot>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #faf5ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <x-heroicon-o-credit-card style="width: 16px; height: 16px; color: #7c3aed;" />
+                </div>
+                <h2 style="font-size: 14px; font-weight: 500; margin: 0;">Cobro</h2>
+            </div>
 
-                <div class="space-y-4">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
 
-                    {{-- Método de pago --}}
-                    <div>
-                        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Método de pago
-                        </label>
-                        <select
-                            wire:model.live="metodoPago"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                        >
-                            <option value="efectivo">💵 Efectivo</option>
-                            <option value="tarjeta">💳 Tarjeta</option>
-                            <option value="transferencia">🔄 Transferencia</option>
-                        </select>
-                    </div>
+                {{-- Método de pago --}}
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 6px;">Método de pago</label>
+                    <select
+                        wire:model.live="metodoPago"
+                        style="width: 100%; height: 38px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f9fafb;"
+                    >
+                        <option value="efectivo">💵 Efectivo</option>
+                        <option value="tarjeta">💳 Tarjeta</option>
+                        <option value="transferencia">🔄 Transferencia</option>
+                    </select>
+                </div>
 
-                    {{-- Monto recibido (solo efectivo) --}}
-                    @if($metodoPago === 'efectivo')
-                    <div>
-                        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Monto recibido
-                        </label>
-                        <input
-                            type="number"
-                            wire:model.live="montoRecibido"
-                            min="0"
-                            step="0.01"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                        />
-                        @if($montoRecibido > 0 && $this->vuelto >= 0)
-                        <p class="mt-1 text-sm font-semibold text-green-600">
-                            Vuelto: ${{ number_format($this->vuelto, 2, ',', '.') }}
-                        </p>
-                        @endif
+                {{-- Monto recibido --}}
+                @if($metodoPago === 'efectivo')
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 6px;">Monto recibido</label>
+                    <input
+                        type="number"
+                        wire:model.live="montoRecibido"
+                        min="0"
+                        step="0.01"
+                        style="width: 100%; height: 38px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f9fafb; box-sizing: border-box;"
+                    />
+                    @if($montoRecibido > 0 && $this->vuelto >= 0)
+                    <div style="margin-top: 8px; background: #f0fdf4; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: #15803d;">Vuelto</span>
+                        <span style="font-size: 15px; font-weight: 700; color: #15803d;">
+                            ${{ number_format($this->vuelto, 2, ',', '.') }}
+                        </span>
                     </div>
                     @endif
-
-                    {{-- Cliente opcional --}}
-                    <div>
-                        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Cliente (opcional)
-                        </label>
-                        <select
-                            wire:model.live="clienteId"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                        >
-                            <option value="">— Venta anónima —</option>
-                            @foreach($this->clientes as $cliente)
-                            <option value="{{ $cliente['value'] }}">{{ $cliente['label'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Resumen --}}
-                    <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Subtotal</span>
-                            <span>${{ number_format($this->totalCarrito, 2, ',', '.') }}</span>
-                        </div>
-                        <div class="mt-2 flex justify-between text-lg font-bold">
-                            <span>Total</span>
-                            <span class="text-primary-600">
-                                ${{ number_format($this->totalCarrito, 2, ',', '.') }}
-                            </span>
-                        </div>
-                    </div>
-
-                    {{-- Botones --}}
-                    <x-filament::button
-                        wire:click="confirmarVenta"
-                        wire:loading.attr="disabled"
-                        color="success"
-                        size="xl"
-                        class="w-full"
-                        icon="heroicon-o-check-circle"
-                    >
-                        <span wire:loading.remove wire:target="confirmarVenta">
-                            Confirmar Venta
-                        </span>
-                        <span wire:loading wire:target="confirmarVenta">
-                            Procesando...
-                        </span>
-                    </x-filament::button>
-
-                    <x-filament::button
-                        wire:click="limpiarCarrito"
-                        wire:confirm="¿Limpiar el carrito? Se perderán los ítems cargados."
-                        color="gray"
-                        size="sm"
-                        class="w-full"
-                        icon="heroicon-o-trash"
-                    >
-                        Limpiar carrito
-                    </x-filament::button>
-
                 </div>
-            </x-filament::section>
-        </div>
+                @endif
+
+                {{-- Cliente --}}
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 6px;">Cliente <span style="font-weight: 400; color: #9ca3af;">(opcional)</span></label>
+                    <select
+                        wire:model.live="clienteId"
+                        style="width: 100%; height: 38px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f9fafb;"
+                    >
+                        <option value="">— Venta anónima —</option>
+                        @foreach($this->clientes as $cliente)
+                        <option value="{{ $cliente['value'] }}">{{ $cliente['label'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Resumen --}}
+                <div style="background: #f9fafb; border-radius: 10px; padding: 14px; border: 1px solid #f3f4f6;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                        <span>Subtotal</span>
+                        <span>${{ number_format($this->totalCarrito, 2, ',', '.') }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+                        <span style="font-size: 13px; font-weight: 500;">Total</span>
+                        <span style="font-size: 20px; font-weight: 700; color: #0f766e;">
+                            ${{ number_format($this->totalCarrito, 2, ',', '.') }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Confirmar --}}
+                <button
+                    wire:click="confirmarVenta"
+                    wire:loading.attr="disabled"
+                    style="width: 100%; height: 46px; background: #16a34a; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                    onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'"
+                >
+                    <x-heroicon-o-check-circle style="width: 18px; height: 18px;" />
+                    <span wire:loading.remove wire:target="confirmarVenta">Confirmar venta</span>
+                    <span wire:loading wire:target="confirmarVenta">Procesando...</span>
+                </button>
+
+                {{-- Limpiar --}}
+                <button
+                    wire:click="limpiarCarrito"
+                    wire:confirm="¿Limpiar el carrito? Se perderán los ítems cargados."
+                    style="width: 100%; height: 36px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                    onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'"
+                >
+                    <x-heroicon-o-trash style="width: 14px; height: 14px;" />
+                    Limpiar carrito
+                </button>
+
+            </div>
+        </x-filament::section>
     </div>
+
+</div>
 </x-filament-panels::page>

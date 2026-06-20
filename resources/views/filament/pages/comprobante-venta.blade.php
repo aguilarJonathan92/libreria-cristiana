@@ -1,96 +1,109 @@
 <x-filament-panels::page>
-    <div class="mx-auto max-w-lg">
-        <x-filament::section>
+<style>
+    .fi-page-content { max-width: 100% !important; }
+</style>
 
-            {{-- Encabezado --}}
-            <div class="mb-6 text-center">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-                    Librería y Regalería Cristiana
-                </h2>
-                <p class="text-sm text-gray-500">
-                    Comprobante de Venta #{{ $venta->id }}
-                </p>
-                <p class="text-sm text-gray-500">
-                    {{ $venta->fecha_hora->format('d/m/Y H:i') }}
-                </p>
-                @if($venta->cliente)
-                <p class="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Cliente: {{ $venta->cliente->nombre }}
-                </p>
-                @endif
+<div style="max-width: 640px; margin: 0 auto;">
+    <x-filament::section>
+
+        {{-- Encabezado --}}
+        <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #f3f4f6; margin-bottom: 20px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: #f0fdf4; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                <x-heroicon-o-receipt-percent style="width: 24px; height: 24px; color: #15803d;" />
             </div>
+            <h2 style="font-size: 17px; font-weight: 600; color: #111827; margin: 0 0 4px;">
+                Librería y Regalería Cristiana
+            </h2>
+            <p style="font-size: 13px; color: #6b7280; margin: 0 0 2px;">
+                Comprobante de Venta #{{ $venta->id }}
+            </p>
+            <p style="font-size: 13px; color: #9ca3af; margin: 0;">
+                {{ $venta->fecha_hora->format('d/m/Y H:i') }}
+            </p>
+            @if($venta->cliente)
+            <div style="display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: #eff6ff; border-radius: 99px; padding: 4px 12px;">
+                <x-heroicon-o-user style="width: 13px; height: 13px; color: #1d4ed8;" />
+                <span style="font-size: 12px; font-weight: 500; color: #1e40af;">{{ $venta->cliente->nombre }}</span>
+            </div>
+            @endif
+        </div>
 
-            {{-- Detalle de productos --}}
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th class="pb-2 text-left font-medium text-gray-500">Producto</th>
-                        <th class="pb-2 text-center font-medium text-gray-500">Cant.</th>
-                        <th class="pb-2 text-right font-medium text-gray-500">Precio</th>
-                        <th class="pb-2 text-right font-medium text-gray-500">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                    @foreach($venta->detalles as $detalle)
-                    <tr>
-                        <td class="py-2 text-gray-900 dark:text-white">
-                            {{ $detalle->producto->nombre }}
-                        </td>
-                        <td class="py-2 text-center text-gray-600">
-                            {{ $detalle->cantidad }}
-                        </td>
-                        <td class="py-2 text-right text-gray-600">
-                            ${{ number_format($detalle->precio_unitario, 2, ',', '.') }}
-                        </td>
-                        <td class="py-2 text-right font-medium">
-                            ${{ number_format($detalle->subtotal(), 2, ',', '.') }}
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr class="border-t-2 border-gray-300 dark:border-gray-600">
-                        <td colspan="3" class="pt-3 text-right font-bold text-gray-900 dark:text-white">
-                            TOTAL
-                        </td>
-                        <td class="pt-3 text-right text-lg font-bold text-primary-600">
-                            ${{ number_format($venta->total, 2, ',', '.') }}
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+        {{-- Tabla de productos --}}
+        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <th style="padding: 0 0 10px; text-align: left; font-size: 11px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Producto</th>
+                    <th style="padding: 0 0 10px; text-align: center; font-size: 11px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Cant.</th>
+                    <th style="padding: 0 0 10px; text-align: right; font-size: 11px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Precio</th>
+                    <th style="padding: 0 0 10px; text-align: right; font-size: 11px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($venta->detalles as $detalle)
+                <tr style="border-bottom: 1px solid #f9fafb;">
+                    <td style="padding: 10px 0; color: #111827; font-weight: 500;">
+                        {{ $detalle->producto->nombre }}
+                    </td>
+                    <td style="padding: 10px 0; text-align: center; color: #6b7280;">
+                        {{ $detalle->cantidad }}
+                    </td>
+                    <td style="padding: 10px 0; text-align: right; color: #6b7280;">
+                        ${{ number_format($detalle->precio_unitario, 2, ',', '.') }}
+                    </td>
+                    <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827;">
+                        ${{ number_format($detalle->subtotal(), 2, ',', '.') }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="padding-top: 16px; text-align: right; font-size: 12px; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Total
+                    </td>
+                    <td style="padding-top: 16px; text-align: right; font-size: 22px; font-weight: 700; color: #0f766e;">
+                        ${{ number_format($venta->total, 2, ',', '.') }}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
 
-            {{-- Pie --}}
-            <div class="mt-6 border-t border-gray-200 pt-4 text-center dark:border-gray-700">
-                <p class="text-xs text-gray-400">
-                    Método de pago: {{ $venta->metodo_pago->getLabel() }}
-                    · Atendido por: {{ $venta->usuario->name }}
+        {{-- Pie --}}
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <p style="font-size: 12px; color: #9ca3af; margin: 0 0 2px;">
+                    Método de pago: <span style="color: #6b7280; font-weight: 500;">{{ $venta->metodo_pago->getLabel() }}</span>
                 </p>
-                <p class="mt-1 text-xs text-gray-400">¡Gracias por su compra!</p>
+                <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                    Atendido por: <span style="color: #6b7280; font-weight: 500;">{{ $venta->usuario->name }}</span>
+                </p>
             </div>
+            <p style="font-size: 13px; color: #9ca3af; margin: 0; font-style: italic;">¡Gracias por su compra!</p>
+        </div>
 
-            {{-- Acciones --}}
-            <div class="mt-6 flex gap-3">
-                <x-filament::button
-                    onclick="window.print()"
-                    color="gray"
-                    icon="heroicon-o-printer"
-                    class="flex-1"
-                >
-                    Imprimir
-                </x-filament::button>
+        {{-- Acciones --}}
+        <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
 
-                <x-filament::button
-                    tag="a"
-                    href="/admin/punto-de-venta"
-                    color="primary"
-                    icon="heroicon-o-shopping-cart"
-                    class="flex-1"
-                >
-                    Nueva Venta
-                </x-filament::button>
-            </div>
+            <button
+                onclick="window.print()"
+                style="height: 40px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-weight: 500; color: #374151; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;"
+                onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'"
+            >
+                <x-heroicon-o-printer style="width: 16px; height: 16px; color: #6b7280;" />
+                Imprimir
+            </button>
 
-        </x-filament::section>
-    </div>
+            
+            <a href="/admin/punto-de-venta"
+                style="height: 40px; background: #16a34a; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none;"
+                onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'"
+            >
+                <x-heroicon-o-shopping-cart style="width: 16px; height: 16px;" />
+                Nueva venta
+            </a>
+
+        </div>
+
+    </x-filament::section>
+</div>
 </x-filament-panels::page>

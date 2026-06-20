@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Enums\EstadoCaja;
+use Filament\Support\Enums\Width;
 use App\Models\Caja;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
@@ -97,5 +98,10 @@ class AbrirCaja extends Page implements HasSchemas
             ->send();
 
         $this->redirect(route('filament.admin.pages.cerrar-caja'));
+    }
+
+    public function getMaxContentWidth(): Width|string|null
+    {
+        return Width::Full;
     }
 }

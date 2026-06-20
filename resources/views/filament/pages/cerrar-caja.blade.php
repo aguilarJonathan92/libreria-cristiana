@@ -1,5 +1,4 @@
 <x-filament-panels::page>
-    <div style="max-width: 42rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
 
         @if($this->cajaActual)
         <x-filament::section>
@@ -56,6 +55,4 @@
                 </div>
             </form>
         </x-filament::section>
-
-    </div>
 </x-filament-panels::page>
