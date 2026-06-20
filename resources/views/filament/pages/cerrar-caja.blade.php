@@ -29,6 +29,48 @@
         </x-filament::section>
         @endif
 
+        {{-- Resumen del día --}}
+<x-filament::section>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: #faf5ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <x-heroicon-o-chart-bar style="width: 16px; height: 16px; color: #7c3aed;" />
+        </div>
+        <div>
+            <h2 style="font-size: 14px; font-weight: 500; margin: 0;">Resumen del turno</h2>
+            <p style="font-size: 12px; color: #6b7280; margin: 0;">{{ $this->cantidadVentas }} {{ $this->cantidadVentas === 1 ? 'venta realizada' : 'ventas realizadas' }}</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+        <div style="background: #f9fafb; border-radius: 8px; padding: 12px 14px;">
+            <p style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin: 0 0 4px;">Efectivo</p>
+            <p style="font-size: 16px; font-weight: 600; color: #0f766e; margin: 0;">
+                ${{ number_format($this->totalEfectivoVentas, 2, ',', '.') }}
+            </p>
+        </div>
+        <div style="background: #f9fafb; border-radius: 8px; padding: 12px 14px;">
+            <p style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin: 0 0 4px;">Tarjeta</p>
+            <p style="font-size: 16px; font-weight: 600; color: #1d4ed8; margin: 0;">
+                ${{ number_format($this->totalTarjetaVentas, 2, ',', '.') }}
+            </p>
+        </div>
+        <div style="background: #f9fafb; border-radius: 8px; padding: 12px 14px;">
+            <p style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin: 0 0 4px;">Transferencia</p>
+            <p style="font-size: 16px; font-weight: 600; color: #92400e; margin: 0;">
+                ${{ number_format($this->totalTransferenciaVentas, 2, ',', '.') }}
+            </p>
+        </div>
+    </div>
+
+    {{-- Total general --}}
+    <div style="margin-top: 12px; padding: 12px 14px; background: #f0fdf4; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 13px; font-weight: 500; color: #374151;">Total recaudado</span>
+        <span style="font-size: 20px; font-weight: 700; color: #0f766e;">
+            ${{ number_format($this->totalEfectivoVentas + $this->totalTarjetaVentas + $this->totalTransferenciaVentas, 2, ',', '.') }}
+        </span>
+    </div>
+</x-filament::section>
+
         <x-filament::section>
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
                 <div style="width: 36px; height: 36px; border-radius: 8px; background: #fee2e2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">

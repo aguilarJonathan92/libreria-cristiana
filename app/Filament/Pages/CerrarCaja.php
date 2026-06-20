@@ -26,6 +26,10 @@ class CerrarCaja extends Page implements HasSchemas
 
     public ?Caja $cajaActual = null;
     public ?array $data = [];
+    public ?float $totalEfectivoVentas = 0;
+    public ?float $totalTarjetaVentas = 0;
+    public ?float $totalTransferenciaVentas = 0;
+    public ?int $cantidadVentas = 0;
 
     // Solo mostrar en el menú si hay caja abierta
     public static function shouldRegisterNavigation(): bool
@@ -41,6 +45,13 @@ class CerrarCaja extends Page implements HasSchemas
             redirect()->route('filament.admin.pages.abrir-caja');
             return;
         }
+
+        $ventas = \App\Models\Venta::where('created_at', '>=', $this->cajaActual->fecha_apertura)->get();
+
+        $this->cantidadVentas           = $ventas->count();
+        $this->totalEfectivoVentas      = $ventas->where('metodo_pago', 'efectivo')->sum('total');
+        $this->totalTarjetaVentas       = $ventas->where('metodo_pago', 'tarjeta')->sum('total');
+        $this->totalTransferenciaVentas = $ventas->where('metodo_pago', 'transferencia')->sum('total');
 
         $this->form->fill();
     }
