@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Ventas\Schemas;
 
 use Filament\Schemas\Schema;
 
-class VentaForm
+class VentaInfolist
 {
     public static function configure(Schema $schema): Schema
     {
