@@ -6,6 +6,7 @@ use App\Enums\EstadoCaja;
 use App\Models\Caja;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Concerns\InteractsWithSchemas;  
 use Filament\Schemas\Contracts\HasSchemas; 
 use Filament\Schemas\Schema;
@@ -19,7 +20,7 @@ class AbrirCaja extends Page implements HasSchemas
 {
     use InteractsWithSchemas;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-building-library';
     protected static ?string $navigationLabel = 'Abrir Caja';
     protected static UnitEnum|string|null $navigationGroup = 'Caja';
     protected static ?int $navigationSort = 1;
@@ -43,17 +44,18 @@ class AbrirCaja extends Page implements HasSchemas
         $this->form->fill();
     }
 
-    public function form(Schema $schema): Schema
+   public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 TextInput::make('monto_inicial')
-                    ->label('Monto inicial en caja ($)')
+                    ->label('Monto Inicial')
                     ->numeric()
                     ->prefix('$')
                     ->required()
                     ->minValue(0)
-                    ->helperText('Ingresá el efectivo disponible al inicio del turno.'),
+                    ->placeholder('Ej: 50.000')
+                    ->helperText('Efectivo disponible al inicio del turno.'),
             ])
             ->statePath('data');
     }
@@ -64,6 +66,7 @@ class AbrirCaja extends Page implements HasSchemas
             Action::make('abrir')
                 ->label('Abrir Caja')
                 ->icon('heroicon-o-lock-open')
+                ->color('success')
                 ->action('abrirCaja'),
         ];
     }
