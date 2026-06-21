@@ -70,6 +70,44 @@
         </span>
     </div>
 </x-filament::section>
+{{-- Diferencia --}}
+<x-filament::section>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <x-heroicon-o-scale style="width: 16px; height: 16px; color: #1d4ed8;" />
+        </div>
+        <div>
+            <h2 style="font-size: 14px; font-weight: 500; margin: 0;">Cuadre de caja</h2>
+            <p style="font-size: 12px; color: #6b7280; margin: 0;">Comparación entre lo esperado y lo contado</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div style="background: #f9fafb; border-radius: 8px; padding: 12px 14px;">
+            <p style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin: 0 0 4px;">Monto inicial</p>
+            <p style="font-size: 15px; font-weight: 600; color: #374151; margin: 0;">
+                ${{ number_format($this->cajaActual->monto_inicial, 2, ',', '.') }}
+            </p>
+        </div>
+        <div style="background: #f9fafb; border-radius: 8px; padding: 12px 14px;">
+            <p style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin: 0 0 4px;">Ventas en efectivo</p>
+            <p style="font-size: 15px; font-weight: 600; color: #0f766e; margin: 0;">
+                ${{ number_format($this->totalEfectivoVentas, 2, ',', '.') }}
+            </p>
+        </div>
+    </div>
+
+    <div style="padding: 14px 16px; background: #eff6ff; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 13px; font-weight: 500; color: #1e40af;">Efectivo esperado en caja</span>
+        <span style="font-size: 20px; font-weight: 700; color: #1d4ed8;">
+            ${{ number_format($this->efectivoEsperado, 2, ',', '.') }}
+        </span>
+    </div>
+
+    <p style="font-size: 12px; color: #9ca3af; margin: 10px 0 0; text-align: center;">
+        Ingresá el monto contado en la sección de abajo para ver la diferencia al cerrar.
+    </p>
+</x-filament::section>
 
         <x-filament::section>
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">

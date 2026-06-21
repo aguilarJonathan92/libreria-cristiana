@@ -92,17 +92,29 @@ class CerrarCaja extends Page implements HasSchemas
 
         $datos = $this->form->getState();
 
+        $diferencia = $datos['monto_final'] - $this->efectivoEsperado;
+
         $this->cajaActual->update([
             'fecha_cierre' => now(),
             'monto_final'  => $datos['monto_final'],
+            'diferencia'   => $diferencia,
             'estado'       => EstadoCaja::Cerrada,
         ]);
 
+        $emoji = $diferencia >= 0 ? '✅' : '⚠️';
+        $signo = $diferencia >= 0 ? '+' : '';
+
         Notification::make()
             ->title('Caja cerrada correctamente')
+            ->body("{$emoji} Diferencia: {$signo}$" . number_format(abs($diferencia), 2, ',', '.') . ($diferencia < 0 ? ' (faltante)' : ' (sobrante)'))
             ->success()
             ->send();
 
         $this->redirect(route('filament.admin.pages.abrir-caja'));
+    }
+
+    public function getEfectivoEsperadoProperty(): float
+    {
+        return $this->cajaActual->monto_inicial + $this->totalEfectivoVentas;
     }
 }
