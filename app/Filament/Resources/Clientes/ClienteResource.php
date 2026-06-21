@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Clientes;
 
 use BackedEnum;
 use UnitEnum;
-use App\Filament\Resources\ClienteResource\Pages;
+use App\Filament\Resources\Clientes\Pages;
 use App\Models\Cliente;
 use Filament\Actions\EditAction;
 use Filament\Actions\ActionGroup;
@@ -23,7 +23,7 @@ class ClienteResource extends Resource
     protected static ?string $navigationLabel = 'Clientes';
     protected static ?string $modelLabel = 'Cliente';
     protected static ?string $pluralModelLabel = 'Clientes';
-    protected static string|UnitEnum|null $navigationGroup = 'Clientes';
+    protected static string|UnitEnum|null $navigationGroup = 'Administración';
     protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
