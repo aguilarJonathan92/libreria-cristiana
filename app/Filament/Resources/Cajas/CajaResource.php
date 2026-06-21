@@ -68,7 +68,21 @@ class CajaResource extends Resource
                     ->label('Final')
                     ->money('ARS')
                     ->placeholder('—'),
+                TextColumn::make('ventas_sum_total')
+                ->label('Total vendido')
+                ->money('ARS')
+                ->placeholder('—')
+                ->sum('ventas', 'total'),
 
+                TextColumn::make('diferencia')
+                ->label('Diferencia')
+                ->money('ARS')
+                ->placeholder('—')
+                ->color(fn ($state) => match(true) {
+                    $state === null  => 'gray',
+                    $state >= 0      => 'success',
+                    default          => 'danger',
+                }),
                 TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()

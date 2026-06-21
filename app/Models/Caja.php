@@ -14,6 +14,7 @@ class Caja extends Model
         'fecha_cierre',
         'monto_inicial',
         'monto_final',
+        'diferencia',
         'estado',
         'usuario_id',
     ];
