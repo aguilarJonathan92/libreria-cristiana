@@ -1,5 +1,41 @@
 <x-filament-panels::page>
 <style>
+    @media print {
+        .fi-sidebar-nav,
+        .fi-sidebar,
+        .fi-topbar,
+        .fi-page-header,
+        .fi-breadcrumbs,
+        [class*="fi-sidebar"],
+        [class*="fi-topbar"] {
+            display: none !important;
+        }
+
+        .fi-body {
+            padding: 0 !important;
+        }
+
+        .fi-main {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .fi-page-content {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .fi-section-content-ctn,
+        .fi-section {
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        button, a[href="/admin/punto-de-venta"] {
+            display: none !important;
+        }
+    }
+
     .fi-page-content { max-width: 100% !important; }
 </style>
 
@@ -82,8 +118,7 @@
         </div>
 
         {{-- Acciones --}}
-        <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-
+        <div class="no-print" style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <button
                 onclick="window.print()"
                 style="height: 40px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-weight: 500; color: #374151; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;"
@@ -93,7 +128,6 @@
                 Imprimir
             </button>
 
-            
             <a href="/admin/punto-de-venta"
                 style="height: 40px; background: #16a34a; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none;"
                 onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'"
@@ -101,7 +135,6 @@
                 <x-heroicon-o-shopping-cart style="width: 16px; height: 16px;" />
                 Nueva venta
             </a>
-
         </div>
 
     </x-filament::section>
