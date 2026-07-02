@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Caja;
 use App\Models\PagoFinanciacion;
 use App\Models\Venta;
+use App\Enums\MetodoPago;
 use Illuminate\Support\Facades\DB;
 
 class PagoService
@@ -22,9 +23,10 @@ class PagoService
         Venta $venta,
         float $monto,
         Caja $caja,
+        MetodoPago|string $metodoPago = MetodoPago::Efectivo,  // ← nuevo
         ?string $notas = null
     ): PagoFinanciacion {
-        return DB::transaction(function () use ($venta, $monto, $caja, $notas) {
+        return DB::transaction(function () use ($venta, $monto, $caja, $metodoPago, $notas) {
 
             if ($monto <= 0) {
                 throw new \InvalidArgumentException('El monto del pago debe ser mayor a cero.');
@@ -36,17 +38,15 @@ class PagoService
                 );
             }
 
-            $pago = PagoFinanciacion::create([
-                'venta_id'    => $venta->id,
-                'cliente_id'  => $venta->cliente_id,
-                'monto_pagado'=> $monto,
-                'fecha_pago'  => now(),
-                'notas'       => $notas,
-                'caja_id'     => $caja->id,
-                // saldo_anterior y saldo_posterior los completa el Observer
+            return PagoFinanciacion::create([
+                'venta_id'     => $venta->id,
+                'cliente_id'   => $venta->cliente_id,
+                'monto_pagado' => $monto,
+                'metodo_pago'  => $metodoPago,  // ← nuevo
+                'fecha_pago'   => now(),
+                'notas'        => $notas,
+                'caja_id'      => $caja->id,
             ]);
-
-            return $pago;
         });
     }
 }

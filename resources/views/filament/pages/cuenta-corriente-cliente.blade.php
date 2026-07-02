@@ -125,6 +125,7 @@
                         </div>
                         <div style="font-size:11px; color:#9ca3af; margin-top:2px;">
                             {{ $pago->fecha_pago->format('d/m/Y H:i') }} · Venta #{{ $pago->venta_id }}
+                            · <span style="font-weight:600;">{{ $pago->metodo_pago->getLabel() }}</span>
                         </div>
                         @if($pago->notas)
                         <div style="font-size:11px; color:#9ca3af; font-style:italic; margin-top:2px;">"{{ $pago->notas }}"</div>

@@ -7,6 +7,8 @@ use UnitEnum;
 use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Venta;
+use App\Enums\MetodoPago;
+use Filament\Forms\Components\Select;
 use App\Services\PagoService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
@@ -51,6 +53,12 @@ class CuentaCorrienteCliente extends Page implements HasSchemas
     {
         return $schema
             ->components([
+                Select::make('metodo_pago')
+                    ->label('Método de pago')
+                    ->options(MetodoPago::class)
+                    ->default('efectivo')
+                    ->required(),
+
                 TextInput::make('monto')
                     ->label('Monto del pago ($)')
                     ->numeric()
@@ -104,6 +112,9 @@ class CuentaCorrienteCliente extends Page implements HasSchemas
             $service->registrarPago(
                 venta: $venta,
                 monto: $datos['monto'],
+                metodoPago: $datos['metodo_pago'] instanceof MetodoPago 
+                    ? $datos['metodo_pago'] 
+                    : MetodoPago::from($datos['metodo_pago']),  // ← nuevo
                 caja: $caja,
                 notas: $datos['notas'] ?? null,
             );
