@@ -34,6 +34,10 @@ class PuntoDeVenta extends Page
     public float $montoRecibido = 0;
     public ?int $clienteId = null;
 
+    // ─── Modo financiado ─────────────────────────────────────────────
+    public bool $esFinanciada = false;
+    public float $montoEntregaInicial = 0;
+
     // ─── Computed ────────────────────────────────────────────────────
     public function getTotalCarritoProperty(): float
     {
@@ -155,15 +159,23 @@ class PuntoDeVenta extends Page
         $this->montoRecibido = 0;
         $this->clienteId = null;
         $this->metodoPago = 'efectivo';
+        $this->esFinanciada = false;          // ← nuevo
+        $this->montoEntregaInicial = 0;        // ← nuevo
     }
 
     // ─── Confirmar venta ─────────────────────────────────────────────
     public function confirmarVenta(): void
     {
-        // Validaciones previas
         if (empty($this->carrito)) {
+            Notification::make()->title('El carrito está vacío')->warning()->send();
+            return;
+        }
+
+        // Validar cliente obligatorio para ventas financiadas
+        if ($this->esFinanciada && !$this->clienteId) {
             Notification::make()
-                ->title('El carrito está vacío')
+                ->title('Seleccioná un cliente')
+                ->body('Las ventas financiadas requieren un cliente registrado.')
                 ->warning()
                 ->send();
             return;
@@ -180,6 +192,22 @@ class PuntoDeVenta extends Page
             return;
         }
 
+        // Advertencia de límite de crédito (DN-002 — no bloquea)
+        if ($this->esFinanciada && $this->clienteId) {
+            $cliente = \App\Models\Cliente::find($this->clienteId);
+            $saldoNuevo = $this->totalCarrito - $this->montoEntregaInicial;
+
+            if ($cliente && $cliente->superaLimiteCredito($saldoNuevo)) {
+                Notification::make()
+                    ->title('⚠️ Límite de crédito superado')
+                    ->body("El cliente quedaría con $" . number_format($cliente->saldo_actual + $saldoNuevo, 2, ',', '.') . " de deuda, superando su límite de $" . number_format($cliente->limite_credito, 2, ',', '.') . ".")
+                    ->warning()
+                    ->persistent()
+                    ->send();
+                // No retorna — solo advierte, permite continuar (DN-002)
+            }
+        }
+
         try {
             $service = new VentaService();
 
@@ -189,17 +217,25 @@ class PuntoDeVenta extends Page
                 'precio_unitario' => $item['precio_unitario'],
             ])->toArray();
 
-            $venta = $service->crearVentaContado(
-                items: $items,
-                metodoPago: MetodoPago::from($this->metodoPago),
-                usuario: Auth::user(),
-                caja: $caja,
-                clienteId: $this->clienteId,
-            );
+            if ($this->esFinanciada) {
+                $venta = $service->crearVentaFinanciada(
+                    items: $items,
+                    montoEntregaInicial: $this->montoEntregaInicial,
+                    clienteId: $this->clienteId,
+                    usuario: Auth::user(),
+                    caja: $caja,
+                );
+            } else {
+                $venta = $service->crearVentaContado(
+                    items: $items,
+                    metodoPago: \App\Enums\MetodoPago::from($this->metodoPago),
+                    usuario: Auth::user(),
+                    caja: $caja,
+                    clienteId: $this->clienteId,
+                );
+            }
 
-            // Guardar ID para el comprobante antes de limpiar
             $ventaId = $venta->id;
-
             $this->limpiarCarrito();
 
             Notification::make()
@@ -208,7 +244,6 @@ class PuntoDeVenta extends Page
                 ->success()
                 ->send();
 
-            // Redirigir al comprobante
             $this->redirect('/admin/comprobante-venta/' . $ventaId);
 
         } catch (\Exception $e) {

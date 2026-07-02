@@ -6,6 +6,7 @@ use BackedEnum;
 use UnitEnum;
 use App\Filament\Resources\Clientes\Pages;
 use App\Models\Cliente;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -46,7 +47,7 @@ class ClienteResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+   public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -58,8 +59,20 @@ class ClienteResource extends Resource
                 TextColumn::make('telefono')
                     ->label('Teléfono'),
 
-                TextColumn::make('email')
-                    ->label('Email')
+                TextColumn::make('saldo_actual')
+                    ->label('Saldo deudor')
+                    ->money('ARS')
+                    ->color(fn (Cliente $record): string =>
+                        $record->tieneDeuda() ? 'danger' : 'success'
+                    )
+                    ->weight(fn (Cliente $record): string =>
+                        $record->tieneDeuda() ? 'bold' : 'normal'
+                    )
+                    ->sortable(),
+
+                TextColumn::make('limite_credito')
+                    ->label('Límite crédito')
+                    ->money('ARS')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('ventas_count')
@@ -67,7 +80,15 @@ class ClienteResource extends Resource
                     ->counts('ventas')
                     ->sortable(),
             ])
-            ->recordActions([EditAction::make()])
+            ->recordActions([
+                Action::make('cuenta_corriente')
+                    ->label('Cuenta Corriente')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('warning')
+                    ->url(fn (Cliente $record): string => '/admin/cuenta-corriente/' . $record->id),
+
+                EditAction::make(),
+            ])
             ->toolbarActions([
                 ActionGroup::make([DeleteBulkAction::make()]),
             ])

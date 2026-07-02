@@ -179,60 +179,152 @@
                 </div>
                 @endif
 
+                {{-- Tipo de venta --}}
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tipo de venta
+                    </label>
+                    <div class="flex gap-2">
+                        <button
+                            wire:click="$set('esFinanciada', false)"
+                            class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition
+                                {{ !$esFinanciada
+                                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
+                                    : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400' }}"
+                        >
+                            💵 Contado
+                        </button>
+                        <button
+                            wire:click="$set('esFinanciada', true)"
+                            class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition
+                                {{ $esFinanciada
+                                    ? 'border-warning-500 bg-warning-50 text-warning-700 dark:bg-warning-900 dark:text-warning-300'
+                                    : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400' }}"
+                        >
+                            📋 Financiada
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Método de pago (solo contado) --}}
+                @if(!$esFinanciada)
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Método de pago
+                    </label>
+                    <select
+                        wire:model.live="metodoPago"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    >
+                        <option value="efectivo">💵 Efectivo</option>
+                        <option value="tarjeta">💳 Tarjeta</option>
+                        <option value="transferencia">🔄 Transferencia</option>
+                    </select>
+                </div>
+
+                {{-- Monto recibido (solo efectivo) --}}
+                @if($metodoPago === 'efectivo')
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Monto recibido
+                    </label>
+                    <input
+                        type="number"
+                        wire:model.live="montoRecibido"
+                        min="0"
+                        step="0.01"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                    @if($montoRecibido > 0 && $this->vuelto >= 0)
+                    <p class="mt-1 text-sm font-semibold text-green-600">
+                        Vuelto: ${{ number_format($this->vuelto, 2, ',', '.') }}
+                    </p>
+                    @endif
+                </div>
+                @endif
+                @endif
+
+                {{-- Entrega inicial (solo financiada) --}}
+                @if($esFinanciada)
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Entrega inicial (puede ser $0)
+                    </label>
+                    <input
+                        type="number"
+                        wire:model.live="montoEntregaInicial"
+                        min="0"
+                        step="0.01"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                    @if($this->totalCarrito > 0)
+                    <p class="mt-1 text-sm text-gray-500">
+                        Quedará debiendo:
+                        <span class="font-semibold text-red-600">
+                            ${{ number_format(max(0, $this->totalCarrito - $montoEntregaInicial), 2, ',', '.') }}
+                        </span>
+                    </p>
+                    @endif
+                </div>
+                @endif
+
                 {{-- Cliente --}}
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 6px;">Cliente <span style="font-weight: 400; color: #9ca3af;">(opcional)</span></label>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Cliente {{ $esFinanciada ? '(obligatorio)' : '(opcional)' }}
+                    </label>
                     <select
                         wire:model.live="clienteId"
-                        style="width: 100%; height: 38px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f9fafb;"
+                        class="w-full rounded-lg border px-3 py-2 text-sm dark:bg-gray-800 dark:text-white
+                            {{ $esFinanciada ? 'border-warning-400 dark:border-warning-600' : 'border-gray-300 dark:border-gray-600' }}"
                     >
-                        <option value="">— Venta anónima —</option>
+                        <option value="">— {{ $esFinanciada ? 'Seleccioná un cliente' : 'Venta anónima' }} —</option>
                         @foreach($this->clientes as $cliente)
                         <option value="{{ $cliente['value'] }}">{{ $cliente['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
 
-                {{-- Resumen --}}
-                <div style="background: #f9fafb; border-radius: 10px; padding: 14px; border: 1px solid #f3f4f6;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 8px;">
-                        <span>Subtotal</span>
-                        <span>${{ number_format($this->totalCarrito, 2, ',', '.') }}</span>
+                    {{-- Resumen --}}
+                    <div style="background: #f9fafb; border-radius: 10px; padding: 14px; border: 1px solid #f3f4f6;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                            <span>Subtotal</span>
+                            <span>${{ number_format($this->totalCarrito, 2, ',', '.') }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+                            <span style="font-size: 13px; font-weight: 500;">Total</span>
+                            <span style="font-size: 20px; font-weight: 700; color: #0f766e;">
+                                ${{ number_format($this->totalCarrito, 2, ',', '.') }}
+                            </span>
+                        </div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid #e5e7eb;">
-                        <span style="font-size: 13px; font-weight: 500;">Total</span>
-                        <span style="font-size: 20px; font-weight: 700; color: #0f766e;">
-                            ${{ number_format($this->totalCarrito, 2, ',', '.') }}
-                        </span>
-                    </div>
+
+                    {{-- Confirmar --}}
+                    <button
+                        wire:click="confirmarVenta"
+                        wire:loading.attr="disabled"
+                        style="width: 100%; height: 46px; background: #16a34a; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                        onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'"
+                    >
+                        <x-heroicon-o-check-circle style="width: 18px; height: 18px;" />
+                        <span wire:loading.remove wire:target="confirmarVenta">Confirmar venta</span>
+                        <span wire:loading wire:target="confirmarVenta">Procesando...</span>
+                    </button>
+
+                    {{-- Limpiar --}}
+                    <button
+                        wire:click="limpiarCarrito"
+                        wire:confirm="¿Limpiar el carrito? Se perderán los ítems cargados."
+                        style="width: 100%; height: 36px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'"
+                    >
+                        <x-heroicon-o-trash style="width: 14px; height: 14px;" />
+                        Limpiar carrito
+                    </button>
+
                 </div>
+            </x-filament::section>
+        </div>
 
-                {{-- Confirmar --}}
-                <button
-                    wire:click="confirmarVenta"
-                    wire:loading.attr="disabled"
-                    style="width: 100%; height: 46px; background: #16a34a; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"
-                    onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'"
-                >
-                    <x-heroicon-o-check-circle style="width: 18px; height: 18px;" />
-                    <span wire:loading.remove wire:target="confirmarVenta">Confirmar venta</span>
-                    <span wire:loading wire:target="confirmarVenta">Procesando...</span>
-                </button>
-
-                {{-- Limpiar --}}
-                <button
-                    wire:click="limpiarCarrito"
-                    wire:confirm="¿Limpiar el carrito? Se perderán los ítems cargados."
-                    style="width: 100%; height: 36px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"
-                    onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'"
-                >
-                    <x-heroicon-o-trash style="width: 14px; height: 14px;" />
-                    Limpiar carrito
-                </button>
-
-            </div>
-        </x-filament::section>
     </div>
-
-</div>
 </x-filament-panels::page>
