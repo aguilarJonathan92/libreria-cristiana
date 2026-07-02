@@ -50,4 +50,21 @@ class Venta extends Model
     {
         return $this->hasMany(DetalleVenta::class);
     }
+
+    public function pagosFinanciacion(): HasMany
+    {
+        return $this->hasMany(PagoFinanciacion::class);
+    }
+
+    // Helper: cuánto se ha pagado en total de esta venta
+    public function totalPagado(): float
+    {
+        return (float) $this->pagosFinanciacion()->sum('monto_pagado');
+    }
+
+    // Helper: si la deuda de esta venta está saldada
+    public function estaSaldada(): bool
+    {
+        return $this->saldo_pendiente <= 0;
+    }
 }
