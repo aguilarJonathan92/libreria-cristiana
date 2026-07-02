@@ -113,8 +113,19 @@ class CerrarCaja extends Page implements HasSchemas
         $this->redirect(route('filament.admin.pages.abrir-caja'));
     }
 
+    public function getTotalEfectivoVentasProperty(): float
+    {
+        if (!$this->cajaActual) return 0;
+        return (float) $this->cajaActual->ventas()
+            ->where('metodo_pago', 'efectivo')
+            ->sum('total');
+    }
+
     public function getEfectivoEsperadoProperty(): float
     {
-        return $this->cajaActual->monto_inicial + $this->totalEfectivoVentas;
+        if (!$this->cajaActual) return 0;
+        return (float) $this->cajaActual->monto_inicial
+            + $this->totalEfectivoVentas
+            + (float) $this->cajaActual->total_cobros_financiacion;
     }
 }

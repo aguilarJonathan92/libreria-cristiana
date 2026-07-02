@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
+use UnitEnum;
 use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Venta;
@@ -19,11 +21,12 @@ class CuentaCorrienteCliente extends Page implements HasSchemas
 {
     use InteractsWithSchemas;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationLabel = 'Cuenta Corriente';
-    protected static ?string $navigationGroup = 'Clientes';
+    protected static UnitEnum|string|null $navigationGroup = 'Clientes';
     protected static ?int $navigationSort = 2;
-    protected static string $view = 'filament.pages.cuenta-corriente-cliente';
+    protected string $view = 'filament.pages.cuenta-corriente-cliente';
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $slug = 'cuenta-corriente/{cliente}';
 
     public ?Cliente $cliente = null;

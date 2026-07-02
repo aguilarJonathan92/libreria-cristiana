@@ -76,6 +76,67 @@ class VentaService
                 // PagoFinanciacionObserver::created() se dispara acá
                 // → decrementa saldo_actual del cliente en $montoEntregaInicial
             }
+            // Sumar a totales de caja
+            $caja->increment('total_ventas', $total);
+
+            return $venta->load('detalles.producto');
+        });
+    }
+
+    public function crearVentaFinanciada(
+        array $items,
+        float $montoEntregaInicial,
+        int $clienteId,
+        User $usuario,
+        Caja $caja
+    ): Venta {
+        return DB::transaction(function () use ($items, $montoEntregaInicial, $clienteId, $usuario, $caja) {
+
+            $total = collect($items)->sum(
+                fn($item) => $item['cantidad'] * $item['precio_unitario']
+            );
+
+            $saldoPendiente = max(0, $total - $montoEntregaInicial);
+
+            $venta = Venta::create([
+                'fecha_hora'            => now(),
+                'total'                 => $total,
+                'monto_entrega_inicial' => $montoEntregaInicial,
+                'saldo_pendiente'       => $saldoPendiente,
+                'tipo_venta'            => \App\Enums\TipoVenta::Financiada,
+                'metodo_pago'           => \App\Enums\MetodoPago::CuentaCorriente,
+                'usuario_id'            => $usuario->id,
+                'caja_id'               => $caja->id,
+                'cliente_id'            => $clienteId,
+            ]);
+
+            foreach ($items as $item) {
+                $venta->detalles()->create([
+                    'producto_id'     => $item['producto_id'],
+                    'cantidad'        => $item['cantidad'],
+                    'precio_unitario' => $item['precio_unitario'],
+                ]);
+
+                \App\Models\Producto::where('id', $item['producto_id'])
+                    ->decrement('stock', $item['cantidad']);
+            }
+
+            if ($montoEntregaInicial > 0) {
+                \App\Models\PagoFinanciacion::create([
+                    'venta_id'    => $venta->id,
+                    'cliente_id'  => $clienteId,
+                    'monto_pagado'=> $montoEntregaInicial,
+                    'fecha_pago'  => now(),
+                    'notas'       => 'Entrega inicial al momento de la venta',
+                    'caja_id'     => $caja->id,
+                ]);
+            }
+
+            // Solo suma el monto efectivamente cobrado hoy (entrega inicial)
+            if ($montoEntregaInicial > 0) {
+                $caja->increment('total_ventas', $montoEntregaInicial);
+            }
+            
             return $venta->load('detalles.producto');
         });
     }

@@ -15,6 +15,8 @@ class Caja extends Model
         'monto_inicial',
         'monto_final',
         'diferencia',
+        'total_ventas',
+    'total_cobros_financiacion',
         'estado',
         'usuario_id',
     ];
@@ -24,6 +26,8 @@ class Caja extends Model
         'fecha_cierre'   => 'datetime',
         'monto_inicial'  => 'decimal:2',
         'monto_final'    => 'decimal:2',
+        'total_ventas'   => 'decimal:2',
+    'total_cobros_financiacion'  => 'decimal:2',
         'estado'         => EstadoCaja::class,
     ];
 
@@ -53,5 +57,12 @@ class Caja extends Model
     public function scopeAbierta($query)
     {
         return $query->where('estado', EstadoCaja::Abierta->value);
+    }
+
+    public function totalDelDia(): float
+    {
+        return (float) $this->monto_inicial
+            + (float) $this->total_ventas
+            + (float) $this->total_cobros_financiacion;
     }
 }

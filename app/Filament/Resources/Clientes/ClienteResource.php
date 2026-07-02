@@ -29,7 +29,7 @@ class ClienteResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             TextInput::make('nombre')
                 ->label('Nombre')
                 ->required()
@@ -44,6 +44,16 @@ class ClienteResource extends Resource
                 ->label('Email')
                 ->email()
                 ->maxLength(255),
+
+            TextInput::make('limite_credito')
+                ->label('Límite de crédito ($)')
+                ->numeric()
+                ->prefix('$')
+                ->default(0)
+                ->minValue(0)
+                ->helperText('Solo modificable por el administrador. Dejar en 0 para sin límite.')
+                ->disabled(fn () => !auth()->user()?->esAdmin())
+                ->dehydrated(fn () => auth()->user()?->esAdmin()),
         ]);
     }
 

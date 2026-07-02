@@ -1,115 +1,146 @@
 <x-filament-panels::page>
-    <div class="space-y-6">
+<div class="space-y-4">
 
-        {{-- ── Resumen del cliente ── --}}
-        <x-filament::section>
-            <x-slot name="heading">{{ $cliente->nombre }}</x-slot>
+    {{-- Resumen --}}
+    <x-filament::section>
+        <x-slot name="heading">{{ $cliente->nombre }}</x-slot>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
 
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                    <p class="text-xs text-gray-500">Teléfono</p>
-                    <p class="font-medium">{{ $cliente->telefono ?? '—' }}</p>
-                </div>
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                    <p class="text-xs text-gray-500">Límite de crédito</p>
-                    <p class="font-medium">${{ number_format($cliente->limite_credito, 2, ',', '.') }}</p>
-                </div>
-                <div class="rounded-lg p-4 {{ $cliente->tieneDeuda() ? 'bg-red-50 dark:bg-red-900' : 'bg-green-50 dark:bg-green-900' }}">
-                    <p class="text-xs text-gray-500">Saldo deudor</p>
-                    <p class="text-lg font-bold {{ $cliente->tieneDeuda() ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
-                        ${{ number_format($cliente->saldo_actual, 2, ',', '.') }}
-                    </p>
-                </div>
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                    <p class="text-xs text-gray-500">Crédito disponible</p>
-                    <p class="font-medium">${{ number_format($cliente->creditoDisponible(), 2, ',', '.') }}</p>
+            <div style="padding:12px; background:#f3f4f6; border-radius:8px;">
+                <div style="font-size:11px; color:#6b7280;">TELÉFONO</div>
+                <div style="font-size:14px; font-weight:600; margin-top:4px;">{{ $cliente->telefono ?? '—' }}</div>
+            </div>
+
+            <div style="padding:12px; background:#f3f4f6; border-radius:8px;">
+                <div style="font-size:11px; color:#6b7280;">LÍMITE DE CRÉDITO</div>
+                <div style="font-size:14px; font-weight:600; margin-top:4px;">${{ number_format($cliente->limite_credito, 2, ',', '.') }}</div>
+            </div>
+
+            <div style="padding:12px; background:{{ $cliente->tieneDeuda() ? '#fef2f2' : '#f0fdf4' }}; border-radius:8px;">
+                <div style="font-size:11px; color:{{ $cliente->tieneDeuda() ? '#ef4444' : '#22c55e' }};">SALDO DEUDOR</div>
+                <div style="font-size:20px; font-weight:700; margin-top:4px; color:{{ $cliente->tieneDeuda() ? '#dc2626' : '#16a34a' }};">
+                    ${{ number_format($cliente->saldo_actual, 2, ',', '.') }}
                 </div>
             </div>
-        </x-filament::section>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-            {{-- ── Ventas financiadas ── --}}
-            <x-filament::section>
-                <x-slot name="heading">Ventas Financiadas</x-slot>
-
-                @forelse($cliente->ventas as $venta)
-                <div
-                    wire:click="seleccionarVenta({{ $venta->id }})"
-                    class="mb-3 cursor-pointer rounded-lg border p-4 transition hover:border-primary-400
-                        {{ $ventaSeleccionadaId === $venta->id
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900'
-                            : 'border-gray-200 dark:border-gray-700' }}"
-                >
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold">Venta #{{ $venta->id }}</p>
-                            <p class="text-xs text-gray-400">{{ $venta->fecha_hora->format('d/m/Y H:i') }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-500">Total: ${{ number_format($venta->total, 2, ',', '.') }}</p>
-                            @if($venta->saldo_pendiente > 0)
-                            <p class="text-sm font-bold text-red-600">
-                                Debe: ${{ number_format($venta->saldo_pendiente, 2, ',', '.') }}
-                            </p>
-                            @else
-                            <p class="text-sm font-bold text-green-600">✓ Saldada</p>
-                            @endif
-                        </div>
-                    </div>
+            <div style="padding:12px; background:#eff6ff; border-radius:8px;">
+                <div style="font-size:11px; color:#3b82f6;">CRÉDITO DISPONIBLE</div>
+                <div style="font-size:20px; font-weight:700; margin-top:4px; color:#2563eb;">
+                    ${{ number_format($cliente->creditoDisponible(), 2, ',', '.') }}
                 </div>
-                @empty
-                <p class="text-sm text-gray-400">Este cliente no tiene ventas financiadas.</p>
-                @endforelse
-            </x-filament::section>
+            </div>
 
-            {{-- ── Registrar pago ── --}}
-            <div class="space-y-4">
-                <x-filament::section>
-                    <x-slot name="heading">
-                        Registrar Pago
-                        @if($ventaSeleccionadaId)
-                        <span class="ml-2 text-sm font-normal text-primary-600">
-                            — Venta #{{ $ventaSeleccionadaId }}
+        </div>
+    </x-filament::section>
+
+    <div style="display:grid; grid-template-columns: 2fr 3fr; gap:16px;">
+
+        {{-- Ventas --}}
+        <x-filament::section>
+            <x-slot name="heading">Ventas Financiadas</x-slot>
+
+            @forelse($cliente->ventas as $venta)
+            <button
+                wire:click="seleccionarVenta({{ $venta->id }})"
+                style="width:100%; text-align:left; padding:12px; border-radius:8px; margin-bottom:8px; border: 2px solid {{ $ventaSeleccionadaId === $venta->id ? '#6366f1' : '#e5e7eb' }}; background:{{ $ventaSeleccionadaId === $venta->id ? '#eef2ff' : '#ffffff' }}; cursor:pointer;"
+            >
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <div style="font-weight:700; font-size:14px;">Venta #{{ $venta->id }}</div>
+                        <div style="font-size:11px; color:#9ca3af; margin-top:2px;">{{ $venta->fecha_hora->format('d/m/Y H:i') }}</div>
+                        <div style="font-size:12px; color:#6b7280; margin-top:4px;">Total: ${{ number_format($venta->total, 2, ',', '.') }}</div>
+                    </div>
+                    <div>
+                        @if($venta->saldo_pendiente > 0)
+                        <span style="font-size:11px; font-weight:700; color:#dc2626; background:#fef2f2; padding:3px 8px; border-radius:999px;">
+                            Debe ${{ number_format($venta->saldo_pendiente, 2, ',', '.') }}
+                        </span>
+                        @else
+                        <span style="font-size:11px; font-weight:700; color:#16a34a; background:#f0fdf4; padding:3px 8px; border-radius:999px;">
+                            ✓ Saldada
                         </span>
                         @endif
-                    </x-slot>
+                    </div>
+                </div>
+                @if($ventaSeleccionadaId === $venta->id)
+                <div style="font-size:11px; color:#6366f1; margin-top:6px;">✓ Seleccionada</div>
+                @endif
+            </button>
+            @empty
+            <p style="font-size:13px; color:#9ca3af; text-align:center; padding:16px 0;">Sin ventas financiadas.</p>
+            @endforelse
+        </x-filament::section>
 
-                    @if(!$ventaSeleccionadaId)
-                    <p class="text-sm text-gray-400">
-                        Seleccioná una venta de la lista para registrar un pago.
-                    </p>
-                    @else
+        {{-- Panel derecho --}}
+        <div style="display:flex; flex-direction:column; gap:16px;">
+
+            {{-- Registrar pago --}}
+            <x-filament::section>
+                <x-slot name="heading">
+                    Registrar Pago
+                    @if($ventaSeleccionadaId)
+                    <span style="font-size:13px; font-weight:400; color:#6366f1; margin-left:8px;">— Venta #{{ $ventaSeleccionadaId }}</span>
+                    @endif
+                </x-slot>
+
+                @if(!$ventaSeleccionadaId)
+                <p style="font-size:13px; color:#9ca3af; text-align:center; padding:16px 0;">
+                    Seleccioná una venta de la lista para registrar un pago.
+                </p>
+                @else
+                    @php $ventaActual = $cliente->ventas->firstWhere('id', $ventaSeleccionadaId); @endphp
+                    @if($ventaActual)
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px;">
+                        <div style="padding:10px; background:#f3f4f6; border-radius:8px; text-align:center;">
+                            <div style="font-size:10px; color:#6b7280;">TOTAL</div>
+                            <div style="font-size:13px; font-weight:600; margin-top:2px;">${{ number_format($ventaActual->total, 2, ',', '.') }}</div>
+                        </div>
+                        <div style="padding:10px; background:#f0fdf4; border-radius:8px; text-align:center;">
+                            <div style="font-size:10px; color:#16a34a;">PAGADO</div>
+                            <div style="font-size:13px; font-weight:600; margin-top:2px; color:#16a34a;">${{ number_format($ventaActual->total - $ventaActual->saldo_pendiente, 2, ',', '.') }}</div>
+                        </div>
+                        <div style="padding:10px; background:#fef2f2; border-radius:8px; text-align:center;">
+                            <div style="font-size:10px; color:#dc2626;">PENDIENTE</div>
+                            <div style="font-size:14px; font-weight:700; margin-top:2px; color:#dc2626;">${{ number_format($ventaActual->saldo_pendiente, 2, ',', '.') }}</div>
+                        </div>
+                    </div>
+                    @endif
+
                     <form wire:submit="registrarPago" class="grid gap-y-4">
                         {{ $this->form }}
                         <x-filament::actions :actions="$this->getFormActions()" />
                     </form>
-                    @endif
-                </x-filament::section>
+                @endif
+            </x-filament::section>
 
-                {{-- ── Historial de pagos ── --}}
-                <x-filament::section>
-                    <x-slot name="heading">Historial de Pagos</x-slot>
+            {{-- Historial --}}
+            <x-filament::section>
+                <x-slot name="heading">Historial de Pagos</x-slot>
 
-                    @forelse($cliente->pagosFinanciacion as $pago)
-                    <div class="mb-2 flex items-center justify-between border-b border-gray-100 pb-2 text-sm dark:border-gray-700">
-                        <div>
-                            <p class="font-medium">${{ number_format($pago->monto_pagado, 2, ',', '.') }}</p>
-                            <p class="text-xs text-gray-400">{{ $pago->fecha_pago->format('d/m/Y H:i') }} — Venta #{{ $pago->venta_id }}</p>
-                            @if($pago->notas)
-                            <p class="text-xs italic text-gray-400">{{ $pago->notas }}</p>
-                            @endif
+                @forelse($cliente->pagosFinanciacion as $pago)
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:10px 0; border-bottom:1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size:14px; font-weight:700; color:#16a34a;">
+                            + ${{ number_format($pago->monto_pagado, 2, ',', '.') }}
                         </div>
-                        <div class="text-right text-xs text-gray-400">
-                            <p>Antes: ${{ number_format($pago->saldo_anterior, 2, ',', '.') }}</p>
-                            <p>Después: ${{ number_format($pago->saldo_posterior, 2, ',', '.') }}</p>
+                        <div style="font-size:11px; color:#9ca3af; margin-top:2px;">
+                            {{ $pago->fecha_pago->format('d/m/Y H:i') }} · Venta #{{ $pago->venta_id }}
                         </div>
+                        @if($pago->notas)
+                        <div style="font-size:11px; color:#9ca3af; font-style:italic; margin-top:2px;">"{{ $pago->notas }}"</div>
+                        @endif
                     </div>
-                    @empty
-                    <p class="text-sm text-gray-400">Sin pagos registrados.</p>
-                    @endforelse
-                </x-filament::section>
-            </div>
+                    <div style="text-align:right; font-size:11px; color:#9ca3af;">
+                        <div>Antes: <span style="color:#dc2626; font-weight:500;">${{ number_format($pago->saldo_anterior, 2, ',', '.') }}</span></div>
+                        <div>Después: <span style="color:#16a34a; font-weight:500;">${{ number_format($pago->saldo_posterior, 2, ',', '.') }}</span></div>
+                    </div>
+                </div>
+                @empty
+                <p style="font-size:13px; color:#9ca3af; text-align:center; padding:16px 0;">Sin pagos registrados.</p>
+                @endforelse
+            </x-filament::section>
+
         </div>
     </div>
+</div>
 </x-filament-panels::page>

@@ -146,69 +146,6 @@
 
                 {{-- Método de pago --}}
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 6px;">Método de pago</label>
-                    <select
-                        wire:model.live="metodoPago"
-                        style="width: 100%; height: 38px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f9fafb;"
-                    >
-                        <option value="efectivo">💵 Efectivo</option>
-                        <option value="tarjeta">💳 Tarjeta</option>
-                        <option value="transferencia">🔄 Transferencia</option>
-                    </select>
-                </div>
-
-                {{-- Monto recibido --}}
-                @if($metodoPago === 'efectivo')
-                <div>
-                    <label style="display: block; font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 6px;">Monto recibido</label>
-                    <input
-                        type="number"
-                        wire:model.live="montoRecibido"
-                        min="0"
-                        step="0.01"
-                        style="width: 100%; height: 38px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f9fafb; box-sizing: border-box;"
-                    />
-                    @if($montoRecibido > 0 && $this->vuelto >= 0)
-                    <div style="margin-top: 8px; background: #f0fdf4; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; color: #15803d;">Vuelto</span>
-                        <span style="font-size: 15px; font-weight: 700; color: #15803d;">
-                            ${{ number_format($this->vuelto, 2, ',', '.') }}
-                        </span>
-                    </div>
-                    @endif
-                </div>
-                @endif
-
-                {{-- Tipo de venta --}}
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tipo de venta
-                    </label>
-                    <div class="flex gap-2">
-                        <button
-                            wire:click="$set('esFinanciada', false)"
-                            class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition
-                                {{ !$esFinanciada
-                                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
-                                    : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400' }}"
-                        >
-                            💵 Contado
-                        </button>
-                        <button
-                            wire:click="$set('esFinanciada', true)"
-                            class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition
-                                {{ $esFinanciada
-                                    ? 'border-warning-500 bg-warning-50 text-warning-700 dark:bg-warning-900 dark:text-warning-300'
-                                    : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400' }}"
-                        >
-                            📋 Financiada
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Método de pago (solo contado) --}}
-                @if(!$esFinanciada)
-                <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Método de pago
                     </label>
@@ -219,10 +156,11 @@
                         <option value="efectivo">💵 Efectivo</option>
                         <option value="tarjeta">💳 Tarjeta</option>
                         <option value="transferencia">🔄 Transferencia</option>
+                        <option value="cuenta_corriente">📋 Cuenta Corriente</option>
                     </select>
                 </div>
 
-                {{-- Monto recibido (solo efectivo) --}}
+                {{-- Monto recibido — solo efectivo --}}
                 @if($metodoPago === 'efectivo')
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -235,56 +173,83 @@
                         step="0.01"
                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     />
-                    @if($montoRecibido > 0 && $this->vuelto >= 0)
+                    @if($montoRecibido > 0)
                     <p class="mt-1 text-sm font-semibold text-green-600">
                         Vuelto: ${{ number_format($this->vuelto, 2, ',', '.') }}
                     </p>
                     @endif
                 </div>
                 @endif
-                @endif
 
-                {{-- Entrega inicial (solo financiada) --}}
-                @if($esFinanciada)
+                {{-- Campos de cuenta corriente --}}
+                @if($metodoPago === 'cuenta_corriente')
+
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Entrega inicial (puede ser $0)
-                    </label>
-                    <input
-                        type="number"
-                        wire:model.live="montoEntregaInicial"
-                        min="0"
-                        step="0.01"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    />
-                    @if($this->totalCarrito > 0)
-                    <p class="mt-1 text-sm text-gray-500">
-                        Quedará debiendo:
-                        <span class="font-semibold text-red-600">
-                            ${{ number_format(max(0, $this->totalCarrito - $montoEntregaInicial), 2, ',', '.') }}
-                        </span>
-                    </p>
-                    @endif
-                </div>
-                @endif
-
-                {{-- Cliente --}}
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Cliente {{ $esFinanciada ? '(obligatorio)' : '(opcional)' }}
+                        Cliente <span class="text-red-500">*</span>
                     </label>
                     <select
                         wire:model.live="clienteId"
-                        class="w-full rounded-lg border px-3 py-2 text-sm dark:bg-gray-800 dark:text-white
-                            {{ $esFinanciada ? 'border-warning-400 dark:border-warning-600' : 'border-gray-300 dark:border-gray-600' }}"
+                        class="w-full rounded-lg border border-orange-400 px-3 py-2 text-sm dark:border-orange-600 dark:bg-gray-800 dark:text-white"
                     >
-                        <option value="">— {{ $esFinanciada ? 'Seleccioná un cliente' : 'Venta anónima' }} —</option>
+                        <option value="">— Seleccioná un cliente —</option>
                         @foreach($this->clientes as $cliente)
                         <option value="{{ $cliente['value'] }}">{{ $cliente['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
 
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Entrega inicial
+                    </label>
+                    <input
+                        type="number"
+                        wire:model.live="montoEntregaInicial"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                    @if($this->totalCarrito > 0)
+                    <div class="mt-2 rounded-lg bg-orange-50 p-3 dark:bg-orange-900/30">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Total venta</span>
+                            <span>${{ number_format($this->totalCarrito, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Entrega inicial</span>
+                            <span>- ${{ number_format($montoEntregaInicial, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="mt-1 flex justify-between border-t border-orange-200 pt-1 text-sm font-bold dark:border-orange-700">
+                            <span class="text-orange-700 dark:text-orange-400">Queda debiendo</span>
+                            <span class="text-orange-700 dark:text-orange-400">
+                                ${{ number_format(max(0, $this->totalCarrito - $montoEntregaInicial), 2, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                @else
+
+                {{-- Cliente opcional para ventas al contado --}}
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Cliente (opcional)
+                    </label>
+                    <select
+                        wire:model.live="clienteId"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    >
+                        <option value="">— Venta anónima —</option>
+                        @foreach($this->clientes as $cliente)
+                        <option value="{{ $cliente['value'] }}">{{ $cliente['label'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                @endif
                     {{-- Resumen --}}
                     <div style="background: #f9fafb; border-radius: 10px; padding: 14px; border: 1px solid #f3f4f6;">
                         <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 8px;">

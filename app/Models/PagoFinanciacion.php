@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PagoFinanciacion extends Model
 {
+    protected $table = 'pago_financiaciones';
+    
     protected $fillable = [
         'monto_pagado',
         'saldo_anterior',

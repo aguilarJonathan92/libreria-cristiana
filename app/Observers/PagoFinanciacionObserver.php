@@ -28,5 +28,8 @@ class PagoFinanciacionObserver
         // Actualizar saldo pendiente de la venta
         Venta::where('id', $pago->venta_id)
             ->decrement('saldo_pendiente', $pago->monto_pagado);
+
+        // ← nuevo: sumar a totales de la caja del día
+        $pago->caja()->increment('total_cobros_financiacion', $pago->monto_pagado);
     }
 }

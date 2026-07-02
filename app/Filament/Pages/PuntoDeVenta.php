@@ -35,7 +35,6 @@ class PuntoDeVenta extends Page
     public ?int $clienteId = null;
 
     // ─── Modo financiado ─────────────────────────────────────────────
-    public bool $esFinanciada = false;
     public float $montoEntregaInicial = 0;
 
     // ─── Computed ────────────────────────────────────────────────────
@@ -159,8 +158,7 @@ class PuntoDeVenta extends Page
         $this->montoRecibido = 0;
         $this->clienteId = null;
         $this->metodoPago = 'efectivo';
-        $this->esFinanciada = false;          // ← nuevo
-        $this->montoEntregaInicial = 0;        // ← nuevo
+        $this->montoEntregaInicial = 0;
     }
 
     // ─── Confirmar venta ─────────────────────────────────────────────
@@ -192,19 +190,24 @@ class PuntoDeVenta extends Page
             return;
         }
 
-        // Advertencia de límite de crédito (DN-002 — no bloquea)
+        // Validación de límite de crédito (DN-002 actualizada — bloqueo duro)
         if ($this->esFinanciada && $this->clienteId) {
             $cliente = \App\Models\Cliente::find($this->clienteId);
             $saldoNuevo = $this->totalCarrito - $this->montoEntregaInicial;
 
-            if ($cliente && $cliente->superaLimiteCredito($saldoNuevo)) {
+            if ($cliente && $cliente->limite_credito > 0 && $cliente->superaLimiteCredito($saldoNuevo)) {
                 Notification::make()
-                    ->title('⚠️ Límite de crédito superado')
-                    ->body("El cliente quedaría con $" . number_format($cliente->saldo_actual + $saldoNuevo, 2, ',', '.') . " de deuda, superando su límite de $" . number_format($cliente->limite_credito, 2, ',', '.') . ".")
-                    ->warning()
+                    ->title('❌ Límite de crédito superado')
+                    ->body(
+                        "El cliente tiene $" . number_format($cliente->saldo_actual, 2, ',', '.') . " de deuda. " .
+                        "Esta venta agregaría $" . number_format($saldoNuevo, 2, ',', '.') . ", " .
+                        "superando su límite de $" . number_format($cliente->limite_credito, 2, ',', '.') . ". " .
+                        "Aumentá el límite desde la ficha del cliente si querés autorizar esta venta."
+                    )
+                    ->danger()
                     ->persistent()
                     ->send();
-                // No retorna — solo advierte, permite continuar (DN-002)
+                return; // ← bloqueo duro: corta la ejecución
             }
         }
 
@@ -266,5 +269,10 @@ class PuntoDeVenta extends Page
 
             $this->redirect(route('filament.admin.pages.abrir-caja'));
         }
+    }
+
+    public function getEsFinanciadaProperty(): bool
+    {
+        return $this->metodoPago === 'cuenta_corriente';
     }
 }
