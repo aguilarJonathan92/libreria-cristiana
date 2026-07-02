@@ -62,6 +62,20 @@ class VentaService
                     ->decrement('stock', $item['cantidad']);
             }
 
+            // 4 — Si hay entrega inicial, registrar como primer pago
+            if ($montoEntregaInicial > 0) {
+                \App\Models\PagoFinanciacion::create([
+                    'venta_id'    => $venta->id,
+                    'cliente_id'  => $clienteId,
+                    'monto_pagado'=> $montoEntregaInicial,
+                    'fecha_pago'  => now(),
+                    'notas'       => 'Entrega inicial al momento de la venta',
+                    'caja_id'     => $caja->id,
+                    // saldo_anterior y saldo_posterior los completa PagoFinanciacionObserver::creating()
+                ]);
+                // PagoFinanciacionObserver::created() se dispara acá
+                // → decrementa saldo_actual del cliente en $montoEntregaInicial
+            }
             return $venta->load('detalles.producto');
         });
     }
