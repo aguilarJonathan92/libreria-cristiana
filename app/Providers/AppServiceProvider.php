@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\PagoFinanciacion;
+use App\Models\Venta;
+use App\Observers\PagoFinanciacionObserver;
+use App\Observers\VentaObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Venta::observe(VentaObserver::class);
+        PagoFinanciacion::observe(PagoFinanciacionObserver::class);
     }
 }
